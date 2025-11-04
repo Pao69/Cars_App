@@ -9,12 +9,9 @@ class AuthService {
       Uri.parse('$baseUrl/login'),
       headers: {
         "Content-Type": "application/json",
-        "Accept": "application/json"
+        "Accept": "application/json",
       },
-      body: jsonEncode({
-        "email": email,
-        "password": password,
-      }),
+      body: jsonEncode({"email": email, "password": password}),
     );
 
     if (response.statusCode == 200) {
@@ -23,23 +20,23 @@ class AuthService {
       await prefs.setString('token', token);
       return true;
     } else {
+      print('Login failed: Status ${response.statusCode} - ${response.body}');
       return false;
     }
   }
 
-  // ✅ Added register method (same pattern as login)
-  static Future<bool> register(String name, String email, String password) async {
+  static Future<bool> register(
+    String name,
+    String email,
+    String password,
+  ) async {
     final response = await http.post(
       Uri.parse('$baseUrl/register'),
       headers: {
         "Content-Type": "application/json",
-        "Accept": "application/json"
+        "Accept": "application/json",
       },
-      body: jsonEncode({
-        "name": name,
-        "email": email,
-        "password": password,
-      }),
+      body: jsonEncode({"name": name, "email": email, "password": password}),
     );
 
     if (response.statusCode == 200) {
@@ -51,6 +48,9 @@ class AuthService {
       }
       return true;
     } else {
+      print(
+        'Register failed: Status ${response.statusCode} - ${response.body}',
+      );
       return false;
     }
   }

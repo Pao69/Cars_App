@@ -29,17 +29,21 @@ class _RegisterPageState extends State<RegisterPage> {
     }
 
     if (password != confirmPassword) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Passwords do not match")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Passwords do not match")));
       return;
     }
 
     bool success = await AuthService.register(name, email, password);
 
+    if (!mounted) return;
+
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Registration successful! Please log in.")),
+        const SnackBar(
+          content: Text("Registration successful! Please log in."),
+        ),
       );
       // Navigate back to LoginPage after successful registration
       Navigator.pushReplacement(
@@ -56,9 +60,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Register Page"),
-      ),
+      appBar: AppBar(title: const Text("Register Page")),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: SingleChildScrollView(

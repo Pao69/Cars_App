@@ -1,6 +1,6 @@
 import "package:flutter/material.dart";
 import "package:crud_lab/services/auth_service.dart";
-import 'package:crud_lab/screens/coffee_list.dart';
+import 'package:crud_lab/screens/car_list.dart';
 import 'register_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -20,11 +20,13 @@ class _LoginPageState extends State<LoginPage> {
 
     bool success = await AuthService.login(email, password);
 
+    if (!mounted) return;
+
     if (success) {
       // Navigate to CoffeeListScreen on success
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const CoffeeListScreen()),
+        MaterialPageRoute(builder: (context) => const CarListScreen()),
       );
     } else {
       // Show error message if login failed
@@ -37,9 +39,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Login Page"),
-      ),
+      appBar: AppBar(title: const Text("Login Page")),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -61,10 +61,7 @@ class _LoginPageState extends State<LoginPage> {
               obscureText: true,
             ),
             const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: login,
-              child: const Text("Login"),
-            ),
+            ElevatedButton(onPressed: login, child: const Text("Login")),
             const SizedBox(height: 10),
             // Add the register button here
             TextButton(
