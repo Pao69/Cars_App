@@ -35,7 +35,12 @@ class _RegisterPageState extends State<RegisterPage> {
       return;
     }
 
-    bool success = await AuthService.register(name, email, password);
+    bool success = await AuthService.register(
+      name,
+      email,
+      password,
+      confirmPassword,
+    );
 
     if (!mounted) return;
 

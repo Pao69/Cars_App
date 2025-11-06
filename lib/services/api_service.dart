@@ -3,13 +3,17 @@ import '../variables.dart';
 import 'package:http/http.dart' as http;
 import '../models/car.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'auth_service.dart'; // Import HttpHelper
 
 class ApiService {
-  static Future<List<Car>> getCars({required String token}) async {
-    final response = await http.get(
-      Uri.parse('$baseUrl/cars'),
-      headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
-    );
+  static Future<String> _getToken() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('token') ?? '';
+  }
+
+  static Future<List<Car>> getCars() async {
+    String token = await _getToken();
+    final response = await HttpHelper.get('/cars', token: token);
 
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
@@ -18,7 +22,7 @@ class ApiService {
             .map((e) => Car.fromJson(Map<String, dynamic>.from(e)))
             .toList();
       } else {
-        throw Exception('Invalid data format: response is not a list');
+        throw Exception('Invalid data format');
       }
     } else {
       throw Exception('Failed to load cars: ${response.statusCode}');
@@ -26,18 +30,8 @@ class ApiService {
   }
 
   static Future<void> createCar(Car car) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    String token = prefs.getString('token') ?? '';
-
-    final response = await http.post(
-      Uri.parse('$baseUrl/cars'),
-      headers: {
-        'Content-Type': 'application/json',
-        "Accept": "application/json",
-        "Authorization": "Bearer $token",
-      },
-      body: json.encode(car.toJson()),
-    );
+    String token = await _getToken();
+    final response = await HttpHelper.post('/cars', car.toJson(), token: token);
 
     if (response.statusCode != 201 && response.statusCode != 200) {
       throw Exception('Failed to create car');
@@ -45,17 +39,11 @@ class ApiService {
   }
 
   static Future<void> updateCar(int id, Car car) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    String token = prefs.getString('token') ?? '';
-
-    final response = await http.put(
-      Uri.parse('$baseUrl/cars/$id'),
-      headers: {
-        'Content-Type': 'application/json',
-        "Accept": "application/json",
-        "Authorization": "Bearer $token",
-      },
-      body: json.encode(car.toJson()),
+    String token = await _getToken();
+    final response = await HttpHelper.put(
+      '/cars/$id',
+      car.toJson(),
+      token: token,
     );
 
     if (response.statusCode != 200 &&
@@ -65,11 +53,9 @@ class ApiService {
     }
   }
 
-  static Future<void> deleteCar(int id, String token) async {
-    final response = await http.delete(
-      Uri.parse('$baseUrl/cars/$id'),
-      headers: {"Authorization": "Bearer $token"},
-    );
+  static Future<void> deleteCar(int id) async {
+    String token = await _getToken();
+    final response = await HttpHelper.delete('/cars/$id', token: token);
 
     if (response.statusCode != 200) {
       throw Exception('Failed to delete car');

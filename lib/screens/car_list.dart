@@ -34,9 +34,8 @@ class _CarListScreenState extends State<CarListScreen> {
   }
 
   void _refreshCars() {
-    if (_token == null) return;
     setState(() {
-      _carList = ApiService.getCars(token: _token!);
+      _carList = ApiService.getCars();
     });
   }
 
@@ -121,7 +120,7 @@ class _CarListScreenState extends State<CarListScreen> {
                               );
                               if (confirm == true) {
                                 try {
-                                  await ApiService.deleteCar(car.id!, _token!);
+                                  await ApiService.deleteCar(car.id!);
                                   _refreshCars();
                                 } catch (e) {
                                   if (mounted) {
